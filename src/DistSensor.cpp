@@ -42,7 +42,7 @@ int distRead()
   //avdist += distances[0];
   avdist = avdist / 5;
   // Prints the distance on the Serial Monitor
-  Serial.print("distance: ");
-  Serial.println(avdist);
+  // Serial.print("distance: ");
+  // Serial.println(avdist);
   return avdist;
 }
