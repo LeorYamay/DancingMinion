@@ -4,6 +4,7 @@
 #include <SoftwareSerial.h>
 #include "DistSensor.h"
 #include "TorsoControl.h"
+#include "ArmsControl.h"
 
 #pragma region testLed
 #define testLed 13
@@ -29,22 +30,33 @@ void setup()
   pinMode(testLed, OUTPUT);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
+  servoRight.attach(servoR);
+  servoLeft.attach(servoL);
   mp3.begin(9600);
   listenMP3();
-  torso.setSpeed(150);
+  torso.setSpeed(200);
 }
 void loop()
 {
-  if (!playing and (distRead()< 90 ))
+  Serial.println(distRead());
+  if (!playing and (distRead() < 90))
   {
-    TorsoGoto(-100);
+    
     sendMP3Command('p');
+    TorsoGoto(-100);
+    LeftSet(135);
+    RightSet(135);
     Serial.println("SentPlay");
     delay(1000);
     TorsoGoto(100);
+    LeftSet(65);
+    RightSet(65);
     delay(1000);
   }
-  TorsoGoto(0);
+  // TorsoGoto(0);
+  RightSet(0);
+  LeftSet(0);
+
   // Serial.println(distRead());
   // sendMP3Command('u');
   listenMP3();
