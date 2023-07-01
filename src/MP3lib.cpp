@@ -37,7 +37,7 @@ void stopsound()
         sendCommand(CMD_STOP_PLAY, 0);
     playing = false;
 }
-void play_all(int track, int num)
+void  play_all(int track, int num)
 {
     int i = 0;
     playthat(track, i);
@@ -212,6 +212,10 @@ String decodeMP3Answer()
     case 0x3A:
         decodedMP3Answer += " -> Memory card inserted.";
         break;
+    
+    case 0x3B:
+        decodedMP3Answer += " -> Memory card ejected.";
+        break;
 
     case 0x3D:
         decodedMP3Answer += " -> Completed play num " + String(ansbuf[6], DEC);
@@ -237,5 +241,4 @@ void listenMP3()
         Serial.println(decodeMP3Answer());
     }
 }
-
 #pragma endregion
