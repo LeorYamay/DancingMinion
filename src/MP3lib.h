@@ -4,11 +4,12 @@
 
 #include <SoftwareSerial.h>
 
-#define ARDUINO_RX 3  // should connect to TX of the Serial MP3 Player module
-#define ARDUINO_TX 2  // connect to RX of the module
+#define ARDUINO_RX 2  // should connect to TX of the Serial MP3 Player module
+#define ARDUINO_TX 3  // connect to RX of the module
 
 extern SoftwareSerial mp3;
 extern bool playing;
+extern bool ack;
 
 /************ Command byte **************************/
 #define CMD_NEXT_SONG          0X01  // Play next song.
@@ -44,15 +45,16 @@ extern bool playing;
 #define SINGLE_CYCLE_ON        0X00
 #define SINGLE_CYCLE_OFF       0X01
 
-void playthis(int track);
-void playthat(int track, int plus);
-void pausesound();
-void stopsound();
-void play_all(int track, int num);
+void PlayThis(int track);
+void PlayThat(int track, int plus);
+void PauseSound();
+void StopSound();
+void PlayAll(int track, int num);
 void sendCommand(int8_t command, int16_t dat);
 String sbyte2hex(uint8_t b);
 String sanswer(void);
 String decodeMP3Answer();
-void sendMP3Command(char c);
-void listenMP3();
+void SendMP3Command(char c);
+void ListenMP3();
+ void PlayRandom();
 #endif

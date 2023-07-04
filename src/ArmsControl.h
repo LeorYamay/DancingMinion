@@ -13,3 +13,6 @@ void RightMove(int right);
 void LeftMove(int left);
 void RightSet(int right);
 void LeftSet(int left);
+int ServoRange(int number);
+void ArmsHome();
+void RandomArms();

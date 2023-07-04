@@ -5,25 +5,37 @@
 
 SoftwareSerial mp3(ARDUINO_RX, ARDUINO_TX);
 bool playing = false;
+bool ack = false;
+const int numTracks = 24;
 
 #pragma region Serialmp3Do
-void playthis(int track)
-{
-    sendCommand(CMD_PLAY_FOLDER_FILE, track);
-    playing = true;
-}
+// void PlayThis(int track)
+// {
+//     sendCommand(CMD_PLAY_FOLDER_FILE , track);
+//     delay(1000);
+//     // playing = true;
+// }
 
 String mess = "";
-void playthat(int track, int plus)
+// void PlayThat(int track, int plus)
+// {
+//     StopSound();
+//     PlayThis(track + plus);
+//     mess = "playing: ";
+//     mess += String(track + plus, HEX);
+//     Serial.println(mess);
+// }
+void PlayThat(int track, int plus)
 {
-    stopsound();
-    playthis(track + plus);
-    mess = "playing: ";
-    mess += String(track + plus, HEX);
-    Serial.println(mess);
+    int trackValue = (plus << 8) | track;
+    StopSound();
+    
+    sendCommand(CMD_PLAY_FOLDER_FILE, trackValue);
+    playing = true;
+    Serial.println("Requested " + String(trackValue, HEX));
 }
 
-void pausesound()
+void PauseSound()
 {
     if (playing)
         sendCommand(CMD_PAUSE, 0);
@@ -31,24 +43,30 @@ void pausesound()
         sendCommand(CMD_PLAY, 0);
     playing = !playing;
 }
-void stopsound()
+void StopSound()
 {
     if (playing)
         sendCommand(CMD_STOP_PLAY, 0);
     playing = false;
 }
-void  play_all(int track, int num)
+void PlayAll(int track, int num)
 {
     int i = 0;
-    playthat(track, i);
+    PlayThat(track, i);
     while (i < num)
     {
         if (!playing)
         {
             i++;
-            playthat(track, i);
+            PlayThat(track, i);
         }
     }
+}
+void PlayRandom()
+{
+    int randomTrack = random(1, numTracks + 1);
+    Serial.println("playing random " + String(randomTrack));
+    PlayThat(randomTrack, 1);
 }
 #pragma endregion
 
@@ -61,19 +79,25 @@ static int8_t Send_buf[8] = {0}; // Buffer for Send commands.  // BETTER LOCALLY
 static uint8_t ansbuf[10] = {0}; // Buffer for the answers.    // BETTER LOCALLY
 void sendCommand(int8_t command, int16_t dat)
 {
-    delay(20);
-    Send_buf[0] = 0x7e;               //
-    Send_buf[1] = 0xff;               //
-    Send_buf[2] = 0x06;               // Len
-    Send_buf[3] = command;            //
-    Send_buf[4] = 0x01;               // 0x00 NO, 0x01 feedback
-    Send_buf[5] = (int8_t)(dat >> 8); // datah
-    Send_buf[6] = (int8_t)(dat);      // datal
-    Send_buf[7] = 0xef;               //
-    for (uint8_t i = 0; i < 8; i++)
+    while (!ack)
     {
-        mp3.write(Send_buf[i]);
+        delay(20);
+        Send_buf[0] = 0x7e;               //
+        Send_buf[1] = 0xff;               //
+        Send_buf[2] = 0x06;               // Len
+        Send_buf[3] = command;            //
+        Send_buf[4] = 0x01;               // 0x00 NO, 0x01 feedback
+        Send_buf[5] = (int8_t)(dat >> 8); // datah
+        Send_buf[6] = (int8_t)(dat);      // datal
+        Send_buf[7] = 0xef;               //
+        for (uint8_t i = 0; i < 8; i++)
+        {
+            mp3.write(Send_buf[i]);
+        }
+        delay(20);
+        ListenMP3();
     }
+    ack = false;
 }
 
 /********************************************************************************/
@@ -137,7 +161,7 @@ String sanswer(void)
 /*Parameter: c. Code for the MP3 Command, 'h' for help.                                                                                                         */
 /*Return:  void                                                                */
 
-void sendMP3Command(char c)
+void SendMP3Command(char c)
 {
     switch (c)
     {
@@ -212,9 +236,10 @@ String decodeMP3Answer()
     case 0x3A:
         decodedMP3Answer += " -> Memory card inserted.";
         break;
-    
+
     case 0x3B:
         decodedMP3Answer += " -> Memory card ejected.";
+        playing = false;
         break;
 
     case 0x3D:
@@ -229,12 +254,13 @@ String decodeMP3Answer()
 
     case 0x41:
         decodedMP3Answer += " -> Data recived correctly. ";
+        ack = true;
         break;
     }
 
     return decodedMP3Answer;
 }
-void listenMP3()
+void ListenMP3()
 {
     while (mp3.available())
     {

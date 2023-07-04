@@ -20,7 +20,10 @@ void blinkTestLED()
   }
 }
 #pragma endregion
-
+bool go = false;
+int dist = -10;
+unsigned long elapsedTime = -10;
+unsigned long startTime = -10;
 void setup()
 {
   // put your setup code here, to run once:
@@ -33,33 +36,44 @@ void setup()
   servoRight.attach(servoR);
   servoLeft.attach(servoL);
   mp3.begin(9600);
-  listenMP3();
+  ListenMP3();
   torso.setSpeed(200);
+  torso.release();
+  startTime = millis();
+  elapsedTime = 5000;
 }
+int track = 1;
 void loop()
 {
-  Serial.println(distRead());
-  if (!playing and (distRead() < 90))
+  dist = DistByAvg(7);
+  go = (3 <= dist) and (dist <= 30);
+  Serial.println(String(go) + "---" + String(elapsedTime) + "----" + String(playing));
+  if (playing or (elapsedTime < 5000))
   {
-    
-    sendMP3Command('p');
-    TorsoGoto(-100);
-    LeftSet(135);
-    RightSet(135);
-    Serial.println("SentPlay");
-    delay(1000);
-    TorsoGoto(100);
-    LeftSet(65);
-    RightSet(65);
-    delay(1000);
+    RandomTorso();
+    RandomArms();
   }
-  // TorsoGoto(0);
-  RightSet(0);
-  LeftSet(0);
-
-  // Serial.println(distRead());
-  // sendMP3Command('u');
-  listenMP3();
+  else
+  {
+    TorsoHome();
+    ArmsHome();
+  }
+  if (!playing and go and (elapsedTime > 5000))
+  {
+    Serial.println("Started");
+    startTime = millis();
+    PlayRandom();
+    RandomTorso();
+    Serial.println("Finished");
+  }
+  elapsedTime = millis() - startTime;
+  if ((elapsedTime > 10000) and playing)
+  {
+    Serial.println("Too long without finishing");
+    StopSound();
+  }
+  ListenMP3();
+  torso.release();
 }
 void SerialEvent()
 {
@@ -69,13 +83,13 @@ void SerialEvent()
     Serial.println("command recieved" + command);
     if (command.length() == 1)
     {
-      sendMP3Command(command.charAt(0));
+      SendMP3Command(command.charAt(0));
     }
   }
-  blinkTestLED();
+  // blinkTestLED();
 }
-void mp3Event()
-{
-  listenMP3();
-  blinkTestLED();
-}
+// void mp3Event()
+// {
+//   ListenMP3();
+//   // blinkTestLED();
+// }
