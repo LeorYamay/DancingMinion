@@ -23,7 +23,7 @@ void RightSet(int right)
 int leftLocate = 180;
 void LeftMove(int left)
 {
-  leftLocate += 180-left;
+  leftLocate -= left;
   leftLocate = ServoRange(leftLocate);
   servoLeft.write(leftLocate);
 }
