@@ -63,8 +63,7 @@ void loop()
     Serial.println("Started");
     startTime = millis();
     PlayRandom();
-    RandomTorso();
-    Serial.println("Finished");
+    
   }
   elapsedTime = millis() - startTime;
   if ((elapsedTime > 10000) and playing)

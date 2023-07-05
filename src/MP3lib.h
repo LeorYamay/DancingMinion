@@ -40,6 +40,12 @@ extern bool ack;
 #define CMD_PLAY_W_VOL         0X22
 #define CMD_PLAYING_N          0x4C
 
+#define CMD_QUERY_STATUS      0x42
+#define CMD_QUERY_VOLUME      0x43
+#define CMD_QUERY_FLDR_TRACKS 0x4e
+#define CMD_QUERY_TOT_TRACKS  0x48
+#define CMD_QUERY_FLDR_COUNT  0x4f
+
 /************ Options **************************/
 #define DEV_TF                 0X02
 #define SINGLE_CYCLE_ON        0X00

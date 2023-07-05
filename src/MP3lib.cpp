@@ -25,14 +25,16 @@ String mess = "";
 //     mess += String(track + plus, HEX);
 //     Serial.println(mess);
 // }
-void PlayThat(int track, int plus)
+void PlayThat(int track, int folder)
 {
-    int trackValue = (plus << 8) | track;
+    int trackValue = (folder << 8) | track;
     StopSound();
     
     sendCommand(CMD_PLAY_FOLDER_FILE, trackValue);
-    playing = true;
-    Serial.println("Requested " + String(trackValue, HEX));
+    // playing = true;
+    delay(50);
+    sendCommand(CMD_QUERY_STATUS,0);
+    Serial.println("Requested folder:"+ String(folder) +" file:"+ String(track));
 }
 
 void PauseSound()
@@ -79,8 +81,6 @@ static int8_t Send_buf[8] = {0}; // Buffer for Send commands.  // BETTER LOCALLY
 static uint8_t ansbuf[10] = {0}; // Buffer for the answers.    // BETTER LOCALLY
 void sendCommand(int8_t command, int16_t dat)
 {
-    while (!ack)
-    {
         delay(20);
         Send_buf[0] = 0x7e;               //
         Send_buf[1] = 0xff;               //
@@ -94,10 +94,6 @@ void sendCommand(int8_t command, int16_t dat)
         {
             mp3.write(Send_buf[i]);
         }
-        delay(20);
-        ListenMP3();
-    }
-    ack = false;
 }
 
 /********************************************************************************/
@@ -181,7 +177,7 @@ void SendMP3Command(char c)
             Serial.println("Play");
             // sendCommand(CMD_PLAY_W_VOL, 0x1E);//play the first song with volume 15 class
             sendCommand(CMD_PLAY, 0);
-            playing = true;
+            // playing = true;
         }
         else
         {
@@ -211,6 +207,18 @@ void SendMP3Command(char c)
     case 'd':
         Serial.println("Volume Down");
         sendCommand(CMD_VOLUME_DOWN, 0);
+        break;
+    case 'r':
+        Serial.println("Reset");
+        sendCommand(CMD_RESET, 0x00);
+        break;
+    case 'W':
+        Serial.println("Wake up");
+        sendCommand(CMD_WAKE_UP, 0x00);
+        break;
+    case 'S':
+        Serial.println("Sleep");
+        sendCommand(CMD_SLEEP_MODE, 0x00);
         break;
     }
 }
@@ -248,6 +256,11 @@ String decodeMP3Answer()
         break;
 
     case 0x4C:
+        decodedMP3Answer += " -> Playing: " + String(ansbuf[6], DEC);
+        playing = true;
+        break;
+
+    case 0x42:
         decodedMP3Answer += " -> Playing: " + String(ansbuf[6], DEC);
         playing = true;
         break;

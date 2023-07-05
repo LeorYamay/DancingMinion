@@ -33,12 +33,14 @@ void LeftSet(int left)
     leftLocate = ServoRange(leftLocate);
     servoLeft.write(leftLocate);
 }
+const int stepMax =30;
 void RandomArms()
 {
-  int leftStep = random(-20,20);
-  int rightStep = random(-20,20);
+  int leftStep = random(-stepMax,stepMax);
+  int rightStep = random(-stepMax,stepMax);
   LeftMove(leftStep);
   RightMove(rightStep);
+  Serial.println("Random Right:" + String(rightLocate) +" Random Left:" +String(leftLocate));
 }
 int ServoRange(int number)
 {

@@ -10,7 +10,7 @@ const int stepsPerRevolution = 32;
 AF_Stepper torso(stepsPerRevolution, 2);
 
 int torsoLocation = 0;
-int stepMax = 45;
+int stepMax = 90;
 void TorsoStep(int steps)
 {
   torsoLocation += steps;
