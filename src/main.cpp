@@ -35,7 +35,7 @@ void setup()
   pinMode(echoPin, INPUT);
   servoRight.attach(servoR);
   servoLeft.attach(servoL);
-  mp3.begin(9600);
+  mp3Setup();
   ListenMP3();
   torso.setSpeed(200);
   torso.release();
@@ -52,6 +52,13 @@ void loop()
   {
     RandomTorso();
     RandomArms();
+    RandomTorso();
+    // SendMP3Command('w');
+    if (!playing and (random(0, 10) < 1))
+    {
+      Serial.println("Random Combo!!");
+      PlayRandom();
+    }
   }
   else
   {
@@ -63,16 +70,22 @@ void loop()
     Serial.println("Started");
     startTime = millis();
     PlayRandom();
-    
   }
-  elapsedTime = millis() - startTime;
-  if ((elapsedTime > 10000) and playing)
+  if (!ack and playing)
   {
     Serial.println("Too long without finishing");
-    StopSound();
+    startTime = millis()-5000;
+    SendMP3Command('W');
+    // StopSound();
   }
   ListenMP3();
   torso.release();
+  elapsedTime = millis() - startTime;
+  if (elapsedTime<0)
+  {
+    startTime = millis() -5000;
+    elapsedTime = 5001;
+  }
 }
 void SerialEvent()
 {
