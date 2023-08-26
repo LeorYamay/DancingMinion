@@ -1,8 +1,8 @@
 //ArmsControl.h
 #include <Servo.h>
 
-#define servoR 9
-#define servoL 10
+#define servoR 10
+#define servoL 9
 
 extern Servo servoRight;
 extern Servo servoLeft;
@@ -16,3 +16,5 @@ void LeftSet(int left);
 int ServoRange(int number);
 void ArmsHome();
 void RandomArms();
+void ArmsSleep();
+void ArmsWake();

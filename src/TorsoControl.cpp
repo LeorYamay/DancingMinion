@@ -21,7 +21,7 @@ void TorsoStep(int steps)
   }
   else
   {
-    torso.step(abs(steps), dir(steps), MICROSTEP);
+    torso.step(abs(steps), dir(steps), SINGLE);
   }
 }
 void TorsoGoto(int location)
@@ -54,6 +54,7 @@ int sgn(int number)
 
 void RandomTorso()
 {
+  
   int randomStep = random(-stepMax,stepMax);
   Serial.println("Torso Step " +String(randomStep));
   TorsoStep(randomStep);
