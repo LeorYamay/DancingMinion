@@ -55,6 +55,7 @@ int sgn(int number)
 void RandomTorso()
 {
   int randomStep = random(-stepMax,stepMax);
+  Serial.println("Torso Step " +String(randomStep));
   TorsoStep(randomStep);
 }
 
